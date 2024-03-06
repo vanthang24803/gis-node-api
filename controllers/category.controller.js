@@ -1,11 +1,11 @@
 import {
-  createAsync,
-  deleteAsync,
-  getAllAsync,
-  isExist,
-  updateAsync,
+  createCategoryAsync,
+  deleteCategoryAsync,
+  getAllCategoryAsync,
+  isExistCategory,
+  updateCategoryAsync,
 } from "../services/category.service.js";
-import { responseMenage } from "../utils/respone.js";
+import { responseMessage } from "../utils/message.js";
 
 export const createCategory = async (req, res) => {
   if (!req.body) {
@@ -15,9 +15,9 @@ export const createCategory = async (req, res) => {
   try {
     const body = req.body;
 
-    const newCategory = await createAsync(body);
+    const newCategory = await createCategoryAsync(body);
 
-    const message = responseMenage(true, newCategory);
+    const message = responseMessage(true, newCategory);
 
     res.status(201).json(message);
   } catch (error) {
@@ -28,13 +28,13 @@ export const createCategory = async (req, res) => {
 
 export const getAllCategory = async (req, res) => {
   try {
-    const result = await getAllAsync();
+    const result = await getAllCategoryAsync();
 
     if (result.length == 0) {
-      return res.status(404).json(responseMenage(false, "Category not found!"));
+      return res.status(404).json(responseMessage(false, "Category not found!"));
     }
 
-    res.status(200).json(responseMenage(true, result));
+    res.status(200).json(responseMessage(true, result));
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error!" });
@@ -49,15 +49,15 @@ export const updateCategory = async (req, res) => {
     return res.status(400).json({ error: "Request body is missing" });
   }
   try {
-    const exitCategory = await isExist(id);
+    const exitCategory = await isExistCategory(id);
 
     if (!exitCategory) {
-      return res.status(404).json(responseMenage(false, "Category not found!"));
+      return res.status(404).json(responseMessage(false, "Category not found!"));
     }
 
-    const result = await updateAsync(id, body);
+    const result = await updateCategoryAsync(id, body);
 
-    res.status(200).json(responseMenage(true, result));
+    res.status(200).json(responseMessage(true, result));
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error!" });
@@ -67,17 +67,17 @@ export const updateCategory = async (req, res) => {
 export const deleteCategory = async (req, res) => {
   const { id } = req.params;
   try {
-    const exitCategory = await isExist(id);
+    const exitCategory = await isExistCategory(id);
 
     if (!exitCategory) {
-      return res.status(404).json(responseMenage(false, "Category not found!"));
+      return res.status(404).json(responseMessage(false, "Category not found!"));
     }
 
-    await deleteAsync(id);
+    await deleteCategoryAsync(id);
 
     res
       .status(200)
-      .json(responseMenage(true, "Category deleted successfully!"));
+      .json(responseMessage(true, "Category deleted successfully!"));
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error!" });

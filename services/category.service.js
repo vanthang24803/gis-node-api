@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma.js";
 
-export const createAsync = async (body) => {
+export const createCategoryAsync = async (body) => {
   const newCategory = await prisma.category.create({
     data: {
       name: body.name,
@@ -9,11 +9,11 @@ export const createAsync = async (body) => {
   return newCategory;
 };
 
-export const getAllAsync = async () => {
+export const getAllCategoryAsync = async () => {
   return await prisma.category.findMany();
 };
 
-export const updateAsync = async (id, body) => {
+export const updateCategoryAsync = async (id, body) => {
   const updateCategory = await prisma.category.update({
     where: { id },
     data: {
@@ -23,7 +23,7 @@ export const updateAsync = async (id, body) => {
   return updateCategory;
 };
 
-export const deleteAsync = async (id) => {
+export const deleteCategoryAsync = async (id) => {
   return await prisma.category.delete({
     where: {
       id,
@@ -31,7 +31,7 @@ export const deleteAsync = async (id) => {
   });
 };
 
-export const isExist = async (id) => {
+export const isExistCategory = async (id) => {
   const category = await prisma.category.findUnique({
     where: {
       id: id,

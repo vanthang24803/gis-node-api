@@ -16,7 +16,7 @@ datasource db {
 enum Rating {
   International
   Nation
-  Conscious
+  Province
 }
 
 model Location {
