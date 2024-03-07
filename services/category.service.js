@@ -39,3 +39,11 @@ export const isExistCategory = async (id) => {
   });
   return Boolean(category);
 };
+
+export const findCategoryByName = async (name) => {
+  return await prisma.category.findFirst({
+    where: {
+      name,
+    },
+  });
+};
