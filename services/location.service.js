@@ -21,7 +21,7 @@ export const createLocationAsync = (data) => {
 
 export const getAllLocationAsync = async (query) => {
   let category;
-  
+
   if (query.category) {
     category = await findCategoryByName(query.category);
   }
@@ -33,6 +33,9 @@ export const getAllLocationAsync = async (query) => {
 
   const listLocations = await prisma.location.findMany({
     where: whereClause,
+    include: {
+      images : true
+    },
   });
 
   const totalLocation = await prisma.location.count({
@@ -47,7 +50,6 @@ export const getAllLocationAsync = async (query) => {
 
   return response;
 };
-
 
 export const getDetailLocationAsync = (id) => {
   return prisma.location.findFirst({
@@ -101,3 +103,4 @@ export const isExistLocationByName = async (name) => {
 
   return Boolean(location);
 };
+
