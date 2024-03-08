@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import prisma from "../lib/prisma.js";
+import { UserResponse } from "../schemas/auth.schema.js";
 
 export const registerAsync = async (request) => {
   const newUser = await prisma.user.create({
@@ -12,11 +13,7 @@ export const registerAsync = async (request) => {
     },
   });
 
-  const response = {
-    ...newUser,
-  };
-
-  delete response.password;
+  const response = UserResponse.parse(newUser);
 
   return response;
 };
@@ -74,8 +71,7 @@ export const findUserByToken = async (token) => {
     throw new Error("User not found");
   }
 
-  const user = { ...existingUser };
-  delete user.password;
+  const user = UserResponse.parse(existingUser);
 
   return {
     status: true,

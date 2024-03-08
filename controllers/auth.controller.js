@@ -36,6 +36,7 @@ export const register = async (req, res) => {
   }
 };
 
+
 export const login = async (req, res) => {
   if (!req.body) {
     return res.status(400).json({ error: "Request body is missing" });
