@@ -10,7 +10,7 @@ export const LocationSchema = z.object({
   y: z.number(),
   rating: z.string().nullable().optional(),
   detail: z.string().min(1),
-  categoryId: z.string().min(1).optional(),
+  categoryId: z.string().min(1),
 });
 
 export const UpdateLocation = z.object({
