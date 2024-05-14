@@ -1,15 +1,19 @@
-FROM node:latest-alpine
+FROM node:alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+RUN npm i -g pnpm
 
-RUN npm i -g pnpm 
+COPY package.json ./
 
-RUN pnpm install
+RUN pnpm i
 
-COPY  . .
+COPY prisma ./prisma
 
-EXPOSE 8080
+RUN npx prisma generate
 
-CMD [ "npm", "start" ]
+COPY  . .  
+
+EXPOSE 8000
+
+CMD [ "pnpm" , "start" ]
