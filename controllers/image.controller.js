@@ -1,50 +1,57 @@
-import {
-  createImageAsync,
-  deleteImageAsync,
-} from "../services/image.service.js";
-import { isExistLocationById } from "../services/location.service.js";
 import { responseMessage } from "../utils/message.js";
+import { PhotoService } from "../services/image.service.js";
+import { LocationService } from "../services/location.service.js";
 
-export const uploadImage = async (req, res) => {
-  const files = req.files;
+const photoService = new PhotoService();
+const locationService = new LocationService();
+export class PhotoController {
+  uploadImage = async (req, res) => {
+    const files = req.files;
 
-  const { id } = req.params;
+    const { id } = req.params;
 
-  if (!files || files.length === 0) {
-    return res.status(400).json({ message: "Please upload a file" });
-  }
-
-  try {
-    const exitingLocation = await isExistLocationById(id);
-
-    if (!exitingLocation) {
-      return res.status(404).json(responseMessage(false, "Location not found"));
+    if (!files || files.length === 0) {
+      return res.status(400).json({ message: "Please upload a file" });
     }
 
-    const result = await createImageAsync(id, files);
+    try {
+      const exitingLocation = await locationService.isExistLocationById(id);
 
-    res.status(200).json(responseMessage(true, result));
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error!" });
-  }
-};
+      if (!exitingLocation) {
+        return res
+          .status(404)
+          .json(responseMessage(false, "Location not found"));
+      }
 
-export const deleteImage = async (req, res) => {
-  const { locationId, id } = req.params;
+      const result = await photoService.createImageAsync(id, files);
 
-  try {
-    const exitingLocation = await isExistLocationById(locationId);
-
-    if (!exitingLocation) {
-      return res.status(404).json(responseMessage(false, "Location not found"));
+      res.status(200).json(responseMessage(true, result));
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Server Error!" });
     }
+  };
 
-    await deleteImageAsync(id);
+  deleteImage = async (req, res) => {
+    const { locationId, id } = req.params;
 
-    res.status(200).json(responseMessage(true, "Image deleted successfully!"));
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error!" });
-  }
-};
+    try {
+      const exitingLocation = await locationService.isExistLocationById(locationId);
+
+      if (!exitingLocation) {
+        return res
+          .status(404)
+          .json(responseMessage(false, "Location not found"));
+      }
+
+      await photoService.deleteImageAsync(id);
+
+      res
+        .status(200)
+        .json(responseMessage(true, "Image deleted successfully!"));
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Server Error!" });
+    }
+  };
+}

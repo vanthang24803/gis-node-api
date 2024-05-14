@@ -1,110 +1,113 @@
-import {
-  findUserByToken,
-  isExitUserByEmail,
-  loginAsync,
-  registerAsync,
-  upgradeToAdmin,
-} from "../services/auth.service.js";
+import { AuthService } from "../services/auth.service.js";
 
-export const register = async (req, res) => {
-  if (!req.body) {
-    return res.status(400).json({ error: "Request body is missing" });
-  }
+const service = new AuthService();
 
-  try {
-    const body = req.body;
-
-    if (!body.email || !body.password) {
-      return res.status(400).json({ error: "Email and password are required" });
+export class AuthController {
+  register = async (req, res) => {
+    if (!req.body) {
+      return res.status(400).json({ error: "Request body is missing" });
     }
 
-    const exitingUser = await isExitUserByEmail(body.email);
+    try {
+      const body = req.body;
 
-    if (exitingUser) {
-      return res.status(400).json({ message: "The Email was registered" });
+      if (!body.email || !body.password) {
+        return res
+          .status(400)
+          .json({ error: "Email and password are required" });
+      }
+
+      const exitingUser = await service.isExitUserByEmail(body.email);
+
+      if (exitingUser) {
+        return res.status(400).json({ message: "The Email was registered" });
+      }
+
+      const result = await service.register(body);
+
+      res.status(201).json({
+        status: true,
+        user: result,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Server is error!" });
+    }
+  };
+
+  login = async (req, res) => {
+    if (!req.body) {
+      return res.status(400).json({ error: "Request body is missing" });
     }
 
-    const result = await registerAsync(body);
+    try {
+      const body = req.body;
 
-    res.status(201).json({
-      status: true,
-      user: result,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server is error!" });
-  }
-};
+      if (!body.email || !body.password) {
+        return res
+          .status(400)
+          .json({ error: "Email and password are required" });
+      }
 
+      const exitingUser = await service.isExitUserByEmail(body.email);
 
-export const login = async (req, res) => {
-  if (!req.body) {
-    return res.status(400).json({ error: "Request body is missing" });
-  }
+      if (!exitingUser) {
+        return res
+          .status(400)
+          .json({ message: "Check your email and password again!" });
+      }
 
-  try {
-    const body = req.body;
+      const result = await service.login(body);
 
-    if (!body.email || !body.password) {
-      return res.status(400).json({ error: "Email and password are required" });
+      if (!result.status) {
+        return res
+          .status(400)
+          .json({ error: "Email and password are required" });
+      }
+
+      res
+        .status(200)
+        .cookie("token", result.token, { maxAge: 24 * 60 * 60 * 1000 })
+        .json(result);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Server is error!" });
+    }
+  };
+
+  profile = async (req, res) => {
+    try {
+      const token = req.cookies.token;
+
+      const result = await service.findUserByToken(token);
+
+      res.status(200).json(result);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Server is error!" });
+    }
+  };
+
+  upgradeRoleAdmin = async (req, res) => {
+    if (!req.body) {
+      return res.status(400).json({ error: "Request body is missing" });
     }
 
-    const exitingUser = await isExitUserByEmail(body.email);
+    try {
+      const body = req.body;
 
-    if (!exitingUser) {
-      return res
-        .status(400)
-        .json({ message: "Check your email and password again!" });
+      const exitingUser = await service.isExitUserByEmail(body.email);
+
+      if (!exitingUser) {
+        return res.status(400).json({ message: "User not found!" });
+      }
+
+      const result = await service.upgradeToAdmin(body);
+
+      return res.status(200).json(result);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Server is error!" });
     }
-
-    const result = await loginAsync(body);
-
-    if (!result.status) {
-      return res.status(400).json({ error: "Email and password are required" });
-    }
-
-    res
-      .status(200)
-      .cookie("token", result.token, { maxAge: 24 * 60 * 60 * 1000 })
-      .json(result);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server is error!" });
-  }
-};
-
-export const profile = async (req, res) => {
-  try {
-    const token = req.cookies.token;
-
-    const result = await findUserByToken(token);
-
-    res.status(200).json(result);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server is error!" });
-  }
-};
-
-export const upgradeRoleAdmin = async (req, res) => {
-  if (!req.body) {
-    return res.status(400).json({ error: "Request body is missing" });
-  }
-
-  try {
-    const body = req.body;
-
-    const exitingUser = await isExitUserByEmail(body.email);
-
-    if (!exitingUser) {
-      return res.status(400).json({ message: "User not found!" });
-    }
-
-    const result = await upgradeToAdmin(body);
-
-    return res.status(200).json(result);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server is error!" });
-  }
-};
+  };
+}

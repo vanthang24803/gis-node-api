@@ -1,9 +1,11 @@
 import express from "express";
-import { deleteImage, uploadImage } from "../controllers/image.controller.js";
+import { PhotoController } from "../controllers/image.controller.js";
 import upload from "../utils/upload.js";
-const router = express.Router();
 
-router.post("/:id" , upload.array('files' , 10) ,uploadImage);
-router.delete("/:locationId/image/:id" , deleteImage);
+const router = express.Router();
+const controller = new PhotoController();
+
+router.post("/:id", upload.array("files", 10), controller.uploadImage);
+router.delete("/:locationId/image/:id", controller.deleteImage);
 
 export default router;

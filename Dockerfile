@@ -4,10 +4,12 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm i -g pnpm 
+
+RUN pnpm install
 
 COPY  . .
 
 EXPOSE 8080
 
-CMD [ "npm", "run" , "dev" ]
+CMD [ "npm", "start" ]
